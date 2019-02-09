@@ -1,0 +1,6 @@
+[submodule "libs/xtl"]
+	path = libs/xtl
+	url = git@github.com:jealas/xtl.git
+[submodule "libs/Catch2"]
+	path = libs/Catch2
+	url = https://github.com/catchorg/Catch2.git
