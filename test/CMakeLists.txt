@@ -5,4 +5,5 @@ include_directories(
 add_executable(test_logic
         test_logic_main.cpp
         test_bits.cpp
+        test_compile.cpp
 )
