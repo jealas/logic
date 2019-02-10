@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-#include <logic/bits_storage.h>
+#include <logic/bit_storage.h>
 
 
 namespace logic {
