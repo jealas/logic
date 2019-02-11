@@ -4,7 +4,7 @@
 #include <logic/default_storage.h>
 
 constexpr logic::bits<1> and_function(logic::bits<2> bits) {
-    return bits.bit<0>() and bits.bit<1>();
+    return {bits.bit<0>() and bits.bit<1>()};
 }
 
 constexpr logic::bits<1> or_function(logic::bits<2> bits) {
@@ -109,27 +109,27 @@ TEST_CASE("Can compile simple logic gates", "[logic][compile]") {
 }
 
 constexpr logic::bits<1> and_function_multi(logic::bits<1> a, logic::bits<1> b) {
-    return a.value() and b.value();
+    return a and b;
 }
 
 constexpr logic::bits<1> or_function_multi(logic::bits<1> a, logic::bits<1> b) {
-    return a.value() or b.value();
+    return a or b;
 }
 
 constexpr logic::bits<1> xor_function_multi(logic::bits<1> a, logic::bits<1> b) {
-    return a.value() xor b.value();
+    return (a or b) and not (a and b);
 }
 
 constexpr logic::bits<1> nand_function_multi(logic::bits<1> a, logic::bits<1> b) {
-    return not (a.value() and b.value());
+    return not (a and b);
 }
 
 constexpr logic::bits<1> nor_function_multi(logic::bits<1> a, logic::bits<1> b) {
-    return not (a.value() or b.value());
+    return not (a or b);
 }
 
 constexpr logic::bits<1> xnor_function_multi(logic::bits<1> a, logic::bits<1> b) {
-    return not (a.value() xor b.value());
+    return not ((a or b) and not (a and b));
 }
 
 TEST_CASE("Can compile simple logic gates with multiple input bits", "[logic][compile]") {
