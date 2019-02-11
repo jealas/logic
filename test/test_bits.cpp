@@ -10,10 +10,10 @@ TEST_CASE("bit function gets the correct bit value", "[logic][bits]") {
         }
 
         SECTION("value initialized") {
-            logic::bits<1> bit_on{1};
+            logic::bits<1> bit_on{true};
             REQUIRE(bit_on.bit<0>() == 1);
 
-            logic::bits<1> bit_off{0};
+            logic::bits<1> bit_off{false};
             REQUIRE(bit_off.bit<0>() == 0);
         }
     }
