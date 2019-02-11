@@ -31,8 +31,7 @@ namespace logic {
     public:
         constexpr bits() : storage_{} {}
 
-        template <storage_type AllBitsMask = bit_mask<0, N>()>
-        constexpr bits(const storage_type storage) : storage_{static_cast<storage_type>(storage bitand AllBitsMask)} {}
+        constexpr bits(const storage_type storage) : storage_{storage} {}
 
         template <size_t OtherN>
         constexpr bits(const bits<OtherN> &b) : storage_{b.value()} {
