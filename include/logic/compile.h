@@ -28,8 +28,8 @@ namespace logic {
 
         template <bit_count_t... InputNs>
         constexpr auto compute_bit_offsets() noexcept {
-            xtl::array<bit_count_t, sizeof...(InputNs)>offsets{} ;
-            xtl::array<bit_count_t, offsets.size()>bit_counts{InputNs...} ;
+            xtl::array<bit_count_t, sizeof...(InputNs)> offsets{};
+            xtl::array<bit_count_t, offsets.size()> bit_counts{InputNs...};
 
             for (auto i = 0u; i < sizeof...(InputNs)-1; ++i) {
                 offsets[1u + i] = offsets[i] + bit_counts[i];
