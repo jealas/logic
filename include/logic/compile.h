@@ -43,7 +43,8 @@ namespace logic {
             constexpr auto bit_start_offsets = detail::compute_bit_offsets<InputNs...>();
             constexpr xtl::array<bit_count_t, bit_start_offsets.size()> bit_lengths{InputNs...};
 
-            return function(input_bits.template bit_span<xtl::get<Indexes>(bit_start_offsets), xtl::get<Indexes>(bit_start_offsets) + xtl::get<Indexes>(bit_lengths)>()...);
+            return function(input_bits.template span<xtl::get<Indexes>(bit_start_offsets),
+                    xtl::get<Indexes>(bit_start_offsets) + xtl::get<Indexes>(bit_lengths)>()...);
 
         }
     }

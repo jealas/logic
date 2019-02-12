@@ -7,10 +7,10 @@
 
 
 namespace logic {
-    template <bit_count_t N, class Storage = bits_storage_t<N>>
+    template <bit_count_t N>
     class bits {
     public:
-        using storage_type = Storage;
+        using storage_type = bits_storage_t<N>;
 
         template <bit_count_t StartBit, bit_count_t EndBit>
         static constexpr storage_type bit_mask() noexcept {
@@ -21,7 +21,7 @@ namespace logic {
             storage_type mask = 0u;
 
             for (auto i = StartBit; i < EndBit; ++i) {
-                mask |= (1 << i);
+                mask |= (1u << i);
             }
 
             return mask;
@@ -31,33 +31,33 @@ namespace logic {
 
     public:
         constexpr bits() : storage_{} {}
-
         constexpr bits(const storage_type storage) : storage_{storage} {}
 
-        template <bit_count_t OtherN>
-        constexpr bits(const bits<OtherN> &b) : storage_{static_cast<storage_type>(b.value())} {
-            static_assert(OtherN <= N, "Cannot assign bits object that has more bits that destination type.");
-        }
+        constexpr bits(const bits &b) : storage_{b.value()} {}
 
-        template <bit_count_t OtherN>
-        constexpr bits& operator=(const bits<OtherN> &b) const noexcept = delete;
+        constexpr bits& operator=(const bits &b) noexcept = default;
+        constexpr bits& operator=(bits &&b) noexcept = default;
 
-        template <bit_count_t OtherN>
-        constexpr bits& operator=(bits<OtherN> &&b) const noexcept = delete;
-
-        constexpr bool operator==(const bits<N> &other) const noexcept { return value() == other.value(); }
+        constexpr bool operator==(const bits &other) const noexcept { return value() == other.value(); }
         constexpr bool operator==(const storage_type &other) const noexcept { return value() == other; }
 
         constexpr storage_type value() const { return storage_; }
 
+        template <bit_count_t OtherN>
+        constexpr bits<OtherN> as() {
+            static_assert(OtherN <= N, "Cannot assign bits object that has more bits that destination type.");
+
+            return {static_cast<typename bits<OtherN>::storage_type>(storage_)};
+        }
+
         template <bit_count_t I>
         constexpr bool bit() const noexcept {
-            constexpr auto mask = bit_mask<I, I+1>();
+            constexpr auto mask = bit_mask<I, I+1u>();
             return storage_ bitand mask;
         }
 
         template <bit_count_t StartBit, bit_count_t EndBit>
-        constexpr bits<EndBit-StartBit> bit_span() const noexcept {
+        constexpr bits<EndBit-StartBit> span() const noexcept {
             constexpr auto mask = bit_mask<StartBit, EndBit>();
             return (storage_ bitand mask) >> StartBit;
         }
@@ -71,12 +71,12 @@ namespace logic {
         storage_type storage_;
     };
 
-    template <class Storage>
-    class bits<1u, Storage> {
-        static constexpr bit_count_t N  = 1;
+    template <>
+    class bits<1u> {
+        static constexpr bit_count_t N  = 1u;
 
     public:
-        using storage_type = Storage;
+        using storage_type = bits_storage_t<N>;
 
         template <bit_count_t StartBit, bit_count_t EndBit>
         static constexpr storage_type bit_mask() noexcept {
@@ -87,7 +87,7 @@ namespace logic {
             storage_type mask = 0u;
 
             for (auto i = StartBit; i < EndBit; ++i) {
-                mask |= (1 << i);
+                mask |= (1u << i);
             }
 
             return mask;
@@ -97,26 +97,25 @@ namespace logic {
 
     public:
         constexpr bits() : storage_{} {}
-
         constexpr bits(bool value) : storage_{static_cast<storage_type>(value ? 1u : 0u)} {}
 
-        template <bit_count_t OtherN>
-        constexpr bits(const bits<OtherN> &b) : storage_{static_cast<storage_type>(b.value())} {
-            static_assert(OtherN <= N, "Cannot assign bits object that has more bits that destination type.");
-        }
+        constexpr bits(const bits &b) : storage_{b.value()} {}
 
-        template <bit_count_t OtherN>
-        constexpr bits& operator=(const bits<OtherN> &b) const noexcept = delete;
+        constexpr bits& operator=(const bits &) noexcept = default;
+        constexpr bits& operator=(bits &&) noexcept = default;
 
-        template <bit_count_t OtherN>
-        constexpr bits& operator=(bits<OtherN> &&b) const noexcept = delete;
-
-        constexpr bool operator==(const bits<N> &other) const noexcept { return value() == other.value(); }
+        constexpr bool operator==(const bits &other) const noexcept { return value() == other.value(); }
         constexpr bool operator==(const storage_type &other) const noexcept { return value() == other; }
 
         constexpr storage_type value() const { return storage_; }
-
         constexpr explicit operator bool() const noexcept { return value(); }
+
+        template <bit_count_t OtherN>
+        constexpr bits<OtherN> as() {
+            static_assert(OtherN <= N, "Cannot assign bits object that has more bits that destination type.");
+
+            return {static_cast<typename bits<OtherN>::storage_type>(storage_)};
+        }
 
         template <bit_count_t I>
         constexpr bool bit() const noexcept {
@@ -125,7 +124,7 @@ namespace logic {
         }
 
         template <bit_count_t StartBit, bit_count_t EndBit>
-        constexpr bits<EndBit-StartBit> bit_span() const noexcept {
+        constexpr bits<EndBit-StartBit> span() const noexcept {
             constexpr auto mask = bit_mask<StartBit, EndBit>();
             return (storage_ bitand mask) >> StartBit;
         }

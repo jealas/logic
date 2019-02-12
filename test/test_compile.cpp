@@ -4,7 +4,7 @@
 #include <logic/default_storage.h>
 
 constexpr logic::bits<1> and_function(logic::bits<2> bits) {
-    return {bits.bit<0>() and bits.bit<1>()};
+    return bits.bit<0>() and bits.bit<1>();
 }
 
 constexpr logic::bits<1> or_function(logic::bits<2> bits) {
