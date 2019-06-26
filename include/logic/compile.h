@@ -8,18 +8,24 @@
 namespace logic {
 
 template <bit_count_t OutputN, bit_count_t... InputNs>
-using logic_function = bits<OutputN> (*)(bits<InputNs>... input_bits);
+using logic_function = bits<OutputN> (*)(bits<InputNs>...);
 
 namespace detail {
 
 template <bit_count_t... Ns> constexpr bit_count_t sum() {
-  bit_count_t sum = 0u;
+  bit_count_t sum_total = 0u;
 
-  for (const auto s : {Ns...}) {
-    sum += s;
+  // Ideally we would iterate over: {Ns...}. However, we would need to manually
+  // specify that we are iterating over a std::initializer_list<bit_count_t>.
+  // This would require that we include <initializer_list> and this header may
+  // not be available on many embedded platforms. Using a simple C-array solves
+  // this problem.
+  const bit_count_t bit_counts[] = {Ns...};
+  for (const auto s : bit_counts) {
+    sum_total += s;
   }
 
-  return sum;
+  return sum_total;
 }
 
 template <bit_count_t NumInputs> constexpr bit_count_t num_possible_outputs() {
@@ -27,7 +33,7 @@ template <bit_count_t NumInputs> constexpr bit_count_t num_possible_outputs() {
                 "The number of inputs cannot exceed the number of bits in a "
                 "bit_count_t.");
 
-  return (1u << NumInputs);
+  return (static_cast<bit_count_t>(1u) << NumInputs);
 }
 
 template <bit_count_t... InputNs>
@@ -35,8 +41,8 @@ constexpr auto compute_bit_offsets() noexcept {
   xtl::array<bit_count_t, sizeof...(InputNs)> offsets{};
   xtl::array<bit_count_t, offsets.size()> bit_counts{InputNs...};
 
-  for (auto i = 0u; i < sizeof...(InputNs) - 1u; ++i) {
-    offsets[i + 1u] = offsets[i] + bit_counts[i];
+  for (auto i = 1u; i < sizeof...(InputNs); ++i) {
+    offsets[i] = offsets[i] + bit_counts[i];
   }
 
   return offsets;
@@ -63,13 +69,17 @@ constexpr auto invoke_function(logic_function<OutputN, InputNs...> function,
 
 } // namespace detail
 
-template <template <class, size_t> class OutputStorage, bit_count_t OutputN,
+template <template <class, bit_count_t> class OutputStorage, bit_count_t OutputN,
           bit_count_t... InputNs>
 constexpr auto compile(logic_function<OutputN, InputNs...> function) {
+  static_assert(sizeof...(InputNs) > 0);
+  static_assert(OutputN > 0);
+
   constexpr auto NumInputs = detail::sum<InputNs...>();
   constexpr auto NumPossibleOutputs = detail::num_possible_outputs<NumInputs>();
 
   OutputStorage<bits<OutputN>, NumPossibleOutputs> output_bits{};
+
 
   for (auto i = 0u; i < NumPossibleOutputs; ++i) {
     output_bits[i] = detail::invoke_function(

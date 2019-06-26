@@ -4,7 +4,8 @@
 
 namespace logic {
 
-template <class BitStorage, size_t NumOutputs> class default_storage {
+template <class BitStorage, size_t NumOutputs>
+class default_storage {
 public:
   using bit_storage_t = BitStorage;
 
