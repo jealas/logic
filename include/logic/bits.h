@@ -135,7 +135,7 @@ public:
   }
 
   template <bit_count_t I> constexpr bool bit() const noexcept {
-    constexpr auto mask = bit_mask<I, I + 1>();
+    constexpr auto mask = bit_mask<I, I + 1u>();
     return storage_ bitand mask;
   }
 

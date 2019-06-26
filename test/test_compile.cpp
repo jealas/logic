@@ -28,7 +28,7 @@ constexpr logic::bits<1> xnor_function(const logic::bits<2> bits) {
 }
 
 constexpr logic::bits<1> not_function(const logic::bits<1> bit) {
-  return not bit.value();
+  return not bit;
 }
 
 TEST_CASE("Can compile simple logic gates", "[logic][compile]") {
