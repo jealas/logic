@@ -3,6 +3,12 @@
 #include <logic/compile.h>
 #include <logic/default_storage.h>
 
+#include <logic/and_fn.hpp>
+#include <logic/nand_fn.hpp>
+#include <logic/nor_fn.hpp>
+#include <logic/or_fn.hpp>
+#include <logic/popcount_fn.hpp>
+
 constexpr logic::bits<1> and_function(const logic::bits<2> bits) {
   return bits.bit<0>() and bits.bit<1>();
 }
@@ -217,5 +223,67 @@ TEST_CASE("Can compile simple logic gates with multiple input bits",
     REQUIRE(compiled_xnor_function[0b01] == 0);
     REQUIRE(compiled_xnor_function[0b10] == 0);
     REQUIRE(compiled_xnor_function[0b11] == 1);
+  }
+}
+
+SCENARIO("and_fn can be used to generate n-way and gates") {
+  WHEN("using a 2-bit and_fn") {
+    auto compiled_and_fn =
+        logic::compile<logic::default_storage>(&logic::and_fn<2u>);
+
+    REQUIRE(compiled_and_fn.size() == 4);
+
+    REQUIRE(compiled_and_fn[0b00] == false);
+    REQUIRE(compiled_and_fn[0b01] == false);
+    REQUIRE(compiled_and_fn[0b10] == false);
+    REQUIRE(compiled_and_fn[0b11] == true);
+  }
+
+  WHEN("using a 2-bit nand_fn") {
+    auto compiled_nand_fn =
+        logic::compile<logic::default_storage>(&logic::nand_fn<2u>);
+
+    REQUIRE(compiled_nand_fn.size() == 4);
+
+    REQUIRE(compiled_nand_fn[0b00] == true);
+    REQUIRE(compiled_nand_fn[0b01] == true);
+    REQUIRE(compiled_nand_fn[0b10] == true);
+    REQUIRE(compiled_nand_fn[0b11] == false);
+  }
+
+  WHEN("using a 2-bit or_fn") {
+    auto compiled_or_fn =
+        logic::compile<logic::default_storage>(&logic::or_fn<2u>);
+
+    REQUIRE(compiled_or_fn.size() == 4);
+
+    REQUIRE(compiled_or_fn[0b00] == false);
+    REQUIRE(compiled_or_fn[0b01] == true);
+    REQUIRE(compiled_or_fn[0b10] == true);
+    REQUIRE(compiled_or_fn[0b11] == true);
+  }
+
+  WHEN("using a 2-bit nor_fn") {
+    auto compiled_nor_fn =
+        logic::compile<logic::default_storage>(&logic::nor_fn<2u>);
+
+    REQUIRE(compiled_nor_fn.size() == 4);
+
+    REQUIRE(compiled_nor_fn[0b00] == true);
+    REQUIRE(compiled_nor_fn[0b01] == false);
+    REQUIRE(compiled_nor_fn[0b10] == false);
+    REQUIRE(compiled_nor_fn[0b11] == false);
+  }
+
+  WHEN("using a 2-bit popcount_fn") {
+    auto compiled_popcount_fn =
+        logic::compile<logic::default_storage>(&logic::popcount_fn<2u>);
+
+    REQUIRE(compiled_popcount_fn.size() == 4);
+
+    REQUIRE(compiled_popcount_fn[0b00] == 0u);
+    REQUIRE(compiled_popcount_fn[0b01] == 1u);
+    REQUIRE(compiled_popcount_fn[0b10] == 1u);
+    REQUIRE(compiled_popcount_fn[0b11] == 2u);
   }
 }

@@ -6,7 +6,7 @@
 namespace logic::function {
 
 template <bit_count_t NumBits>
-constexpr bit_count_t num_possible_outputs() noexcept {
+constexpr bit_count_t num_possible_decoder_outputs() noexcept {
   static_assert(
       NumBits > 0 and NumBits <= 6,
       "Decoders only support 2-64 output bits, so only 1-6 input bits.");
@@ -15,7 +15,7 @@ constexpr bit_count_t num_possible_outputs() noexcept {
 }
 
 template <bit_count_t NumInputBits>
-constexpr bits<(1u << NumInputBits)>
+constexpr bits<num_possible_decoder_outputs<NumInputBits>()>
 decoder(bits<NumInputBits> input_bits) {
   return 1u << input_bits.value();
 }
